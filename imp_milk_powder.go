@@ -61,7 +61,7 @@ func (t *ImpChaincode) initMilkPowder(stub shim.ChaincodeStubInterface, args []s
 		milkPowderAssetByte, _ = json.Marshal(milkPowderAsset)
 	}
 	_ = stub.PutState(id, milkPowderByte)
-	_ = stub.PutState(mspid+id, milkPowderAssetByte)
+	_ = stub.PutState(getAssetId(mspid, id), milkPowderAssetByte)
 	return shim.Success(nil)
 }
 

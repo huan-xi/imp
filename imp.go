@@ -11,12 +11,20 @@ org3还给org2
 
 CAFILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
 TLSRootCertFiles=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-peer chaincode install -p github.com/chaincode/imp -n cc -v 0
-peer chaincode instantiate -n cc -v 0 -c '{"Args":[]}' -C $CHANNEL_NAME --tls --cafile $CAFILE
+
+peer chaincode install -p github.com/chaincode/imp -n $CC -v 0.1
+
+peer chaincode instantiate -C tracechannel -n $CC -v 0.1 -c '{"Args":[]}'
+
+peer chaincode invoke -C tracechannel -n $CC  -c '{"Args":["initMilkPowder","1","4234","123123","432423"]}'
+peer chaincode query -C tracechannel -n $CC  -c '{"Args":["queryMilkPowder","1"]}'
+peer chaincode invoke -C tracechannel -n $CC  -c '{"Args":["transferMilkPowder","Org2MSP","1","1231"]}'
+peer chaincode query -C tracechannel -n $CC  -c '{"Args":["queryMilkPowderAsset","Org2MSP"]}'
+
+-C $CHANNEL_NAME --tls --cafile $CAFILE
 peer chaincode query -n cc -c '{"Args":["readMilk", "milk1"]}' -C $CHANNEL_NAME
-peer chaincode invoke -C mychannel -n cc  --cafile $CAFILE -c '{"Args":["queryOrg","Org1MSP"]}' --tls true
-peer chaincode invoke -C mychannel -n cc  --cafile $CAFILE -c '{"Args":[query,a]}' --tls true
-peer chaincode invoke -C mychannel -n cc  --cafile $CAFILE -c '{"Args":["initMilkPowder","1","4234","123123","432423"]}' --tls true
+
+peer chaincode invoke -C tracechannel -n $CC  -c '{"Args":["initOrg","Org1MSP"]}'
 peer chaincode query -n cc -c '{"Args":["queryOrg"]}' -C $CHANNEL_NAME --cafile $CAFILE
 
 --cafile $CAFILE --peerAddresses peer0.org1.example.com:9051

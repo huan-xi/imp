@@ -84,6 +84,7 @@ func (t *ImpChaincode) manufacture(stub shim.ChaincodeStubInterface, args []stri
 /*
 将产品交给检测机构（送检）
 输入产品编号，检测机构id,检测信息
+检测奶粉是否存在
 */
 func (t *ImpChaincode) toInspect(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 	if len(args) != 2 {
@@ -135,6 +136,7 @@ func (t *ImpChaincode) inspect(stub shim.ChaincodeStubInterface, args []string) 
 	time, _ := stub.GetTxTimestamp()
 	inspectInfo := inspectInfo{mspId, time.Seconds, desc}
 	product.InspectInfo = inspectInfo
+	product.Status = 2
 	productByte, _ = json.Marshal(product)
 	stub.PutState(productId, productByte)
 	return shim.Success(nil)

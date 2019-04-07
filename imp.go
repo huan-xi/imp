@@ -101,6 +101,8 @@ func (t *ImpChaincode) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return t.toInspect(stub, args)
 	} else if function == "inspect" {
 		return t.inspect(stub, args)
+	} else if function == "getMyInspect" {
+		return t.getMyInspect(stub, args)
 	}
 	return shim.Error("no this invoke function:" + function)
 }

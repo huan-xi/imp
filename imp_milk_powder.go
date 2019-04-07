@@ -61,7 +61,7 @@ func (t *ImpChaincode) initMilkPowder(stub shim.ChaincodeStubInterface, args []s
 		milkPowderAssetByte, _ = json.Marshal(milkPowderAsset)
 	}
 	_ = stub.PutState(id, milkPowderByte)
-	_ = stub.PutState(getAssetId(mspid, id), milkPowderAssetByte)
+	_ = stub.PutState(getPowderAssetId(mspid, id), milkPowderAssetByte)
 	return shim.Success(nil)
 }
 
@@ -99,7 +99,7 @@ func (t *ImpChaincode) transferMilkPowder(stub shim.ChaincodeStubInterface, args
 		return shim.Error("This recipients not exists: " + recipients)
 	}
 	//检查发件人余额
-	milkPowderAssetSendByte, err := stub.GetState(getAssetId(mspid, milkPowderId))
+	milkPowderAssetSendByte, err := stub.GetState(getPowderAssetId(mspid, milkPowderId))
 	if err != nil {
 		return shim.Error("get state failed" + err.Error())
 	} else if milkPowderAssetSendByte == nil {
@@ -111,12 +111,13 @@ func (t *ImpChaincode) transferMilkPowder(stub shim.ChaincodeStubInterface, args
 		return shim.Error("not sufficient funds")
 	}
 	//建立收件人资产
-	milkPowderRecipientsAssetByte, err := stub.GetState(getAssetId(recipients, milkPowderId))
+	milkPowderRecipientsAssetByte, err := stub.GetState(getPowderAssetId(recipients, milkPowderId))
 	time, _ := stub.GetTxTimestamp()
 	milkPowderRecipientsAsset := milkPowderAsset{0, recipients, milkPowderId, time.Seconds}
 	if err != nil {
 		return shim.Error("get state failed" + err.Error())
 	} else if milkPowderRecipientsAssetByte != nil {
+		//如果存在资产这不需要建立
 		_ = json.Unmarshal(milkPowderRecipientsAssetByte, milkPowderRecipientsAsset)
 	}
 	//减少
@@ -163,6 +164,6 @@ func (t *ImpChaincode) queryMilkPowder(stub shim.ChaincodeStubInterface, args []
 	return shim.Success(valAsbytes)
 }
 
-func getAssetId(mspid string, milkPowderId string) string {
+func getPowderAssetId(mspid string, milkPowderId string) string {
 	return mspid + milkPowderId + "milkPowderAsset"
 }

@@ -59,12 +59,18 @@ type milkPowder struct {
 }
 
 type product struct {
-	Id   string `json:"id"` // 出厂编号
-	Time int64  `json:"time"`
+	Id          string      `json:"id"`   // 出厂编号
+	Desc        string      `json:"Desc"` //描述信息
+	Weight      int64       `json:"weight"`
+	Creator     string      `json:"creator"` //出厂厂家
+	Time        int64       `json:"time"`    //出厂时间
+	Status      int8        `json:"status"`  //状态 0：未检测，1：在检，2，已检
+	InspectInfo inspectInfo `json:"inspect_info"`
 }
 type inspectInfo struct {
-	Time int64  `json:"time"` //检测时间
-	Desc string `json:"Desc"` //检测信息营养成分等
+	Inspection string `json:"inspection"` //检测机构
+	Time       int64  `json:"time"`       //检测时间
+	Desc       string `json:"Desc"`       //检测信息营养成分等
 }
 
 //初始化方法
@@ -89,6 +95,12 @@ func (t *ImpChaincode) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return t.queryMilkPowder(stub, args)
 	} else if function == "queryMilkPowderAsset" {
 		return t.queryMilkPowderAsset(stub, args)
+	} else if function == "manufacture" {
+		return t.manufacture(stub, args)
+	} else if function == "toInspect" {
+		return t.toInspect(stub, args)
+	} else if function == "inspect" {
+		return t.inspect(stub, args)
 	}
 	return shim.Error("no this invoke function:" + function)
 }

@@ -15,7 +15,7 @@ TLSRootCertFiles=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerO
 peer chaincode install -p github.com/chaincode/imp -n $CC -v 0.1
 
 peer chaincode instantiate -C tracechannel -n $CC -v 0.1 -c '{"Args":[]}'
-
+peer chaincode upgrade -C tracechannel  -o orderer.example.com:7050 -n $CC -v 0.2 -c '{"Args":[]}'
 peer chaincode invoke -C tracechannel -n $CC  -c '{"Args":["initMilkPowder","1","4234","123123","432423"]}'
 peer chaincode query -C tracechannel -n $CC  -c '{"Args":["queryMilkPowder","1"]}'
 peer chaincode invoke -C tracechannel -n $CC  -c '{"Args":["transferMilkPowder","Org2MSP","1","1231"]}'
@@ -103,6 +103,10 @@ func (t *ImpChaincode) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return t.inspect(stub, args)
 	} else if function == "getMyInspect" {
 		return t.getMyInspect(stub, args)
+	} else if function == "queryProductAsset" {
+		return t.queryProductAsset(stub, args)
+	} else if function == "queryProduct" {
+		return t.queryProduct(stub, args)
 	}
 	return shim.Error("no this invoke function:" + function)
 }

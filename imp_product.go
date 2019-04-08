@@ -158,6 +158,39 @@ func (t *ImpChaincode) getMyInspect(stub shim.ChaincodeStubInterface, args []str
 	return shim.Success(queryResults)
 }
 
+//查询资产
+//输入id 查询起产品所有资产 Owner
+func (t *ImpChaincode) queryProductAsset(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	if len(args) < 1 {
+		return shim.Error("Incorrect number of arguments. Expecting 1，owner")
+	}
+	owner := args[0]
+	sql := "{\"selector\": {\"owner\": \"%s\",\"count\": {\"$gt\": 0}}}"
+	queryString := fmt.Sprintf(sql, owner)
+	queryResults, err := getQueryResultForQueryString(stub, queryString)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	return shim.Success(queryResults)
+}
+
+//查询产品
+func (t *ImpChaincode) queryProduct(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expecting 1 id ")
+	}
+	name := args[0]
+	valAsbytes, err := stub.GetState(name) //get the milk from chaincode state
+	if err != nil {
+		jsonResp := "{\"Error\":\"Failed to get state for " + name + "\"}"
+		return shim.Error(jsonResp)
+	} else if valAsbytes == nil {
+		jsonResp := "{\"Error\":\"product does not exist: " + name + "\"}"
+		return shim.Error(jsonResp)
+	}
+	return shim.Success(valAsbytes)
+}
+
 func getToInspectionId(productId string, inspectiosnId string) string {
 	return productId + inspectiosnId + "productAsset"
 }

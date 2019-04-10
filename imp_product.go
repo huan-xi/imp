@@ -71,7 +71,7 @@ func (t *ImpChaincode) manufacture(stub shim.ChaincodeStubInterface, args []stri
 		return shim.Error("already exist this product")
 	}
 	//建立product
-	product := product{productId, desc, w, mspId, time.Seconds, 0, inspectInfo{"", 0, ""}}
+	product := product{productId, desc, milkId, w, mspId, time.Seconds, 0, inspectInfo{"", 0, ""}}
 	productAsset := productAsset{c, mspId, productId, time.Seconds}
 	//保存奶粉产品资产
 	productByte, _ := json.Marshal(product)

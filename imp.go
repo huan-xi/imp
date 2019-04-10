@@ -14,10 +14,10 @@ export CORE_PEER_LOCALMSPID="Org2MSP"&&export CORE_PEER_TLS_ROOTCERT_FILE=/opt/g
 CAFILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
 TLSRootCertFiles=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
 
-peer chaincode install -p github.com/chaincode/imp -n $CC -v 0.1
+peer chaincode install -p github.com/chaincode/imp -n $CC -v 1.1
 
 peer chaincode instantiate -C tracechannel -n $CC -v 0.1 -c '{"Args":[]}'
-peer chaincode upgrade -C tracechannel  -o orderer.example.com:7050 -n $CC -v 0.2 -c '{"Args":[]}'
+peer chaincode upgrade -C tracechannel  -o orderer.example.com:7050 -n $CC -v 1.1 -c '{"Args":[]}'
 peer chaincode invoke -C tracechannel -n $CC  -c '{"Args":["initMilkPowder","1","4234","123123","432423"]}'
 peer chaincode query -C tracechannel -n $CC  -c '{"Args":["queryMilkPowder","1"]}'
 peer chaincode invoke -C tracechannel -n $CC  -c '{"Args":["transferMilkPowder","Org2MSP","1","1231"]}'
@@ -64,6 +64,7 @@ type milkPowder struct {
 type product struct {
 	Id          string      `json:"id"`   // 出厂编号
 	Desc        string      `json:"Desc"` //描述信息
+	Milk        string      `json:"milk"` //奶粉id
 	Weight      int64       `json:"weight"`
 	Creator     string      `json:"creator"` //出厂厂家
 	Time        int64       `json:"time"`    //出厂时间

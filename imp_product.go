@@ -96,8 +96,8 @@ func (t *ImpChaincode) toInspect(stub shim.ChaincodeStubInterface, args []string
 	if err != nil {
 		return shim.Error("get state failed" + err.Error())
 	}
-	if productByte != nil {
-		return shim.Error("already exist this product")
+	if productByte == nil {
+		return shim.Error("not exist this product")
 	}
 	time, _ := stub.GetTxTimestamp()
 	toInspect := toInspect{productId, time.Seconds, inspectionId}

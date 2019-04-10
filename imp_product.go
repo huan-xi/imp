@@ -102,7 +102,7 @@ func (t *ImpChaincode) toInspect(stub shim.ChaincodeStubInterface, args []string
 	time, _ := stub.GetTxTimestamp()
 	toInspect := toInspect{productId, time.Seconds, inspectionId}
 	product := product{}
-	json.Unmarshal(productByte, product)
+	json.Unmarshal(productByte, &product)
 	//product.InspectInfo=inspectInfo
 	product.Status = 1
 	productByte, _ = json.Marshal(product)
@@ -132,7 +132,10 @@ func (t *ImpChaincode) inspect(stub shim.ChaincodeStubInterface, args []string) 
 		return shim.Error("not exist this product")
 	}
 	product := product{}
-	json.Unmarshal(productByte, product)
+	erro := json.Unmarshal(productByte, product)
+	if erro != nil {
+		return shim.Error(err.Error())
+	}
 	time, _ := stub.GetTxTimestamp()
 	inspectInfo := inspectInfo{mspId, time.Seconds, desc}
 	product.InspectInfo = inspectInfo
@@ -142,7 +145,7 @@ func (t *ImpChaincode) inspect(stub shim.ChaincodeStubInterface, args []string) 
 	return shim.Success(nil)
 }
 
-//查询我的待检测检测
+//查询我的待检测
 //没有输入
 func (t *ImpChaincode) getMyInspect(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 	mspId, err := cid.GetMSPID(stub)

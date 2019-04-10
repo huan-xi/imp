@@ -127,8 +127,8 @@ func (t *ImpChaincode) transferMilkPowder(stub shim.ChaincodeStubInterface, args
 	//存
 	milkPowderRecipientsAssetByte, _ = json.Marshal(milkPowderRecipientsAsset)
 	milkPowderAssetSendByte, _ = json.Marshal(milkPowderSendAsset)
-	_ = stub.PutState(recipients+milkPowderId, milkPowderRecipientsAssetByte)
-	_ = stub.PutState(mspid+milkPowderId, milkPowderAssetSendByte)
+	_ = stub.PutState(getPowderAssetId(recipients, milkPowderId), milkPowderRecipientsAssetByte)
+	_ = stub.PutState(getPowderAssetId(mspid, milkPowderId), milkPowderAssetSendByte)
 	return shim.Success(nil)
 }
 

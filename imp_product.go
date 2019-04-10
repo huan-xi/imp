@@ -132,7 +132,7 @@ func (t *ImpChaincode) inspect(stub shim.ChaincodeStubInterface, args []string) 
 		return shim.Error("not exist this product")
 	}
 	product := product{}
-	erro := json.Unmarshal(productByte, product)
+	erro := json.Unmarshal(productByte, &product)
 	if erro != nil {
 		return shim.Error(err.Error())
 	}

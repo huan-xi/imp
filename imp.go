@@ -17,7 +17,7 @@ TLSRootCertFiles=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerO
 peer chaincode install -p github.com/chaincode/imp -n $CC -v 1.1
 
 peer chaincode instantiate -C tracechannel -n $CC -v 0.1 -c '{"Args":[]}'
-peer chaincode upgrade -C tracechannel  -o orderer.example.com:7050 -n $CC -v 1.1 -c '{"Args":[]}'
+peer chaincode upgrade -C tracechannel  -o orderer.example.com:7050 -n imp -v 1.1 -c '{"Args":[]}'
 peer chaincode invoke -C tracechannel -n $CC  -c '{"Args":["initMilkPowder","1","4234","123123","432423"]}'
 peer chaincode query -C tracechannel -n $CC  -c '{"Args":["queryMilkPowder","1"]}'
 peer chaincode invoke -C tracechannel -n $CC  -c '{"Args":["transferMilkPowder","Org2MSP","1","1231"]}'
@@ -56,14 +56,14 @@ type milkPowder struct {
 	Id         string `json:"id"` // 出厂编号
 	Time       int64  `json:"time"`
 	Weight     int64  `json:"weight"`
-	Desc       string `json:"Desc"`
+	Desc       string `json:"desc"`
 	CattleInfo string `json:"cattle_info"`
 	Creator    string `json:"creator"`
 }
 
 type product struct {
 	Id          string      `json:"id"`   // 出厂编号
-	Desc        string      `json:"Desc"` //描述信息
+	Desc        string      `json:"desc"` //描述信息
 	Milk        string      `json:"milk"` //奶粉id
 	Weight      int64       `json:"weight"`
 	Creator     string      `json:"creator"` //出厂厂家
@@ -74,7 +74,7 @@ type product struct {
 type inspectInfo struct {
 	Inspection string `json:"inspection"` //检测机构
 	Time       int64  `json:"time"`       //检测时间
-	Desc       string `json:"Desc"`       //检测信息营养成分等
+	Desc       string `json:"desc"`       //检测信息营养成分等
 }
 
 //初始化方法

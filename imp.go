@@ -56,6 +56,7 @@ type milkPowder struct {
 	Weight     int64  `json:"weight"`
 	Desc       string `json:"Desc"`
 	CattleInfo string `json:"cattle_info"`
+	Creator    string `json:"creator"`
 }
 
 type product struct {
@@ -83,16 +84,10 @@ func (t *ImpChaincode) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 	function, args := stub.GetFunctionAndParameters()
 	if function == "initOrg" {
 		return t.initOrg(stub, args)
-	} else if function == "updateOrg" {
-		return t.updateOrg(stub, args)
-	} else if function == "queryOrg" {
-		return t.queryOrg(stub, args)
 	} else if function == "initMilkPowder" {
 		return t.initMilkPowder(stub, args)
 	} else if function == "transferMilkPowder" {
 		return t.transferMilkPowder(stub, args)
-	} else if function == "queryMilkPowder" {
-		return t.queryMilkPowder(stub, args)
 	} else if function == "queryMilkPowderAsset" {
 		return t.queryMilkPowderAsset(stub, args)
 	} else if function == "manufacture" {
@@ -105,8 +100,8 @@ func (t *ImpChaincode) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return t.getMyInspect(stub, args)
 	} else if function == "queryProductAsset" {
 		return t.queryProductAsset(stub, args)
-	} else if function == "queryProduct" {
-		return t.queryProduct(stub, args)
+	} else if function == "get" {
+		return t.get(stub, args)
 	}
 	return shim.Error("no this invoke function:" + function)
 }

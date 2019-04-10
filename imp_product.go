@@ -175,7 +175,7 @@ func (t *ImpChaincode) queryProductAsset(stub shim.ChaincodeStubInterface, args 
 }
 
 //查询产品
-func (t *ImpChaincode) queryProduct(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+func (t *ImpChaincode) get(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1 id ")
 	}
@@ -185,7 +185,7 @@ func (t *ImpChaincode) queryProduct(stub shim.ChaincodeStubInterface, args []str
 		jsonResp := "{\"Error\":\"Failed to get state for " + name + "\"}"
 		return shim.Error(jsonResp)
 	} else if valAsbytes == nil {
-		jsonResp := "{\"Error\":\"product does not exist: " + name + "\"}"
+		jsonResp := "{\"Error\":\"does not exist: " + name + "\"}"
 		return shim.Error(jsonResp)
 	}
 	return shim.Success(valAsbytes)

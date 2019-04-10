@@ -37,11 +37,12 @@ func (t *ImpChaincode) initMilkPowder(stub shim.ChaincodeStubInterface, args []s
 	if m != nil {
 		return shim.Error("this id  exist")
 	}
-	milkPowder := milkPowder{id, time.Seconds, w, desc, cattleInfo}
+	mspid, err := cid.GetMSPID(stub)
+	milkPowder := milkPowder{id, time.Seconds, w, desc, cattleInfo, mspid}
 	milkPowderByte, _ := json.Marshal(milkPowder)
 	//建立资产
 	//mspid := "org1"
-	mspid, err := cid.GetMSPID(stub)
+
 	if err != nil {
 		return shim.Error("get id failed" + err.Error())
 	}
@@ -145,23 +146,6 @@ func (t *ImpChaincode) queryMilkPowderAsset(stub shim.ChaincodeStubInterface, ar
 		return shim.Error(err.Error())
 	}
 	return shim.Success(queryResults)
-}
-
-//查询奶粉
-func (t *ImpChaincode) queryMilkPowder(stub shim.ChaincodeStubInterface, args []string) peer.Response {
-	if len(args) != 1 {
-		return shim.Error("Incorrect number of arguments. Expecting 1 id ")
-	}
-	name := args[0]
-	valAsbytes, err := stub.GetState(name) //get the milk from chaincode state
-	if err != nil {
-		jsonResp := "{\"Error\":\"Failed to get state for " + name + "\"}"
-		return shim.Error(jsonResp)
-	} else if valAsbytes == nil {
-		jsonResp := "{\"Error\":\"milk does not exist: " + name + "\"}"
-		return shim.Error(jsonResp)
-	}
-	return shim.Success(valAsbytes)
 }
 
 func getPowderAssetId(mspid string, milkPowderId string) string {

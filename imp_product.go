@@ -71,7 +71,7 @@ func (t *ImpChaincode) manufacture(stub shim.ChaincodeStubInterface, args []stri
 		return shim.Error("already exist this product")
 	}
 	//建立product
-	product := product{productId, desc, w, mspId, time.Seconds, 0, inspectInfo{"", 0, ""}}
+	product := product{productId, desc, milkId, w, mspId, time.Seconds, 0, inspectInfo{"", 0, ""}}
 	productAsset := productAsset{c, mspId, productId, time.Seconds}
 	//保存奶粉产品资产
 	productByte, _ := json.Marshal(product)
@@ -96,13 +96,13 @@ func (t *ImpChaincode) toInspect(stub shim.ChaincodeStubInterface, args []string
 	if err != nil {
 		return shim.Error("get state failed" + err.Error())
 	}
-	if productByte != nil {
-		return shim.Error("already exist this product")
+	if productByte == nil {
+		return shim.Error("not exist this product")
 	}
 	time, _ := stub.GetTxTimestamp()
 	toInspect := toInspect{productId, time.Seconds, inspectionId}
 	product := product{}
-	json.Unmarshal(productByte, product)
+	json.Unmarshal(productByte, &product)
 	//product.InspectInfo=inspectInfo
 	product.Status = 1
 	productByte, _ = json.Marshal(product)
@@ -132,7 +132,10 @@ func (t *ImpChaincode) inspect(stub shim.ChaincodeStubInterface, args []string) 
 		return shim.Error("not exist this product")
 	}
 	product := product{}
-	json.Unmarshal(productByte, product)
+	erro := json.Unmarshal(productByte, &product)
+	if erro != nil {
+		return shim.Error(err.Error())
+	}
 	time, _ := stub.GetTxTimestamp()
 	inspectInfo := inspectInfo{mspId, time.Seconds, desc}
 	product.InspectInfo = inspectInfo
@@ -142,7 +145,7 @@ func (t *ImpChaincode) inspect(stub shim.ChaincodeStubInterface, args []string) 
 	return shim.Success(nil)
 }
 
-//查询我的待检测检测
+//查询我的待检测
 //没有输入
 func (t *ImpChaincode) getMyInspect(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 	mspId, err := cid.GetMSPID(stub)
@@ -175,7 +178,7 @@ func (t *ImpChaincode) queryProductAsset(stub shim.ChaincodeStubInterface, args 
 }
 
 //查询产品
-func (t *ImpChaincode) queryProduct(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+func (t *ImpChaincode) get(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1 id ")
 	}
@@ -185,7 +188,7 @@ func (t *ImpChaincode) queryProduct(stub shim.ChaincodeStubInterface, args []str
 		jsonResp := "{\"Error\":\"Failed to get state for " + name + "\"}"
 		return shim.Error(jsonResp)
 	} else if valAsbytes == nil {
-		jsonResp := "{\"Error\":\"product does not exist: " + name + "\"}"
+		jsonResp := "{\"Error\":\"does not exist: " + name + "\"}"
 		return shim.Error(jsonResp)
 	}
 	return shim.Success(valAsbytes)

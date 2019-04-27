@@ -32,40 +32,6 @@ func (t *ImpChaincode) initOrg(stub shim.ChaincodeStubInterface, args []string) 
 	return shim.Success(nil)
 }
 
-func (t *ImpChaincode) updateOrg(stub shim.ChaincodeStubInterface, args []string) peer.Response {
-	if len(args) != 1 {
-		return shim.Error("Incorrect number of arguments. Expecting 1 desc")
-	}
-	mspid, err := cid.GetMSPID(stub)
-	if err != nil {
-		return shim.Error("get id failed" + err.Error())
-	}
-	orgBytes, err := stub.GetState(mspid)
-	if err != nil {
-		return shim.Error("get state error" + err.Error())
-	}
-	if orgBytes == nil {
-		return shim.Error("no this org:" + mspid)
-	}
-	//反序列化
-	org := orgInfo{}
-	err = json.Unmarshal(orgBytes, &org)
-	if err != nil {
-		return shim.Error("json unmarshal error" + err.Error())
-	}
-	org.Desc = args[0]
-	orgBytes, err = json.Marshal(org)
-	if err != nil {
-		return shim.Error("json marsha :" + err.Error())
-	}
-
-	err = stub.PutState(mspid, orgBytes)
-	if err != nil {
-		return shim.Error("put state error" + err.Error())
-	}
-	return shim.Success(nil)
-}
-
 func getQueryResultForQueryString(stub shim.ChaincodeStubInterface, queryString string) ([]byte, error) {
 
 	fmt.Printf("- getQueryResultForQueryString queryString:\n%s\n", queryString)
@@ -109,21 +75,4 @@ func constructQueryResponseFromIterator(resultsIterator shim.StateQueryIteratorI
 	buffer.WriteString("]")
 
 	return &buffer, nil
-}
-
-func (t *ImpChaincode) queryOrg(stub shim.ChaincodeStubInterface, args []string) peer.Response {
-	if len(args) != 1 {
-		return shim.Error("Incorrect number of arguments. Expecting 1 mspId")
-	}
-	mspid := args[0]
-	orgByte, err := stub.GetState(mspid) //get the milk from chaincode state
-	jsonResp := ""
-	if err != nil {
-		jsonResp = "{\"Error\":\"Failed to get state for " + mspid + "\"}"
-		return shim.Error(jsonResp)
-	} else if orgByte == nil {
-		jsonResp = "{\"Error\":\"org does not exist: " + mspid + "\"}"
-		return shim.Error(jsonResp)
-	}
-	return shim.Success(orgByte)
 }

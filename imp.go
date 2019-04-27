@@ -9,13 +9,15 @@ org2 加工奶粉成产品（批次编号，数量，出厂时间，配料，检
 org3获得产品，填写检测信息（营养成分，检测时间）
 org3还给org2
 
+export CORE_PEER_LOCALMSPID="Org2MSP"&&export CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt&&export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp&&export CORE_PEER_ADDRESS=peer0.org2.example.com:9051
+
 CAFILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
 TLSRootCertFiles=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
 
-peer chaincode install -p github.com/chaincode/imp -n $CC -v 0.1
+peer chaincode install -p github.com/chaincode/imp -n $CC -v 1.1
 
 peer chaincode instantiate -C tracechannel -n $CC -v 0.1 -c '{"Args":[]}'
-peer chaincode upgrade -C tracechannel  -o orderer.example.com:7050 -n $CC -v 0.2 -c '{"Args":[]}'
+peer chaincode upgrade -C tracechannel  -o orderer.example.com:7050 -n imp -v 1.1 -c '{"Args":[]}'
 peer chaincode invoke -C tracechannel -n $CC  -c '{"Args":["initMilkPowder","1","4234","123123","432423"]}'
 peer chaincode query -C tracechannel -n $CC  -c '{"Args":["queryMilkPowder","1"]}'
 peer chaincode invoke -C tracechannel -n $CC  -c '{"Args":["transferMilkPowder","Org2MSP","1","1231"]}'
@@ -54,13 +56,15 @@ type milkPowder struct {
 	Id         string `json:"id"` // 出厂编号
 	Time       int64  `json:"time"`
 	Weight     int64  `json:"weight"`
-	Desc       string `json:"Desc"`
+	Desc       string `json:"desc"`
 	CattleInfo string `json:"cattle_info"`
+	Creator    string `json:"creator"`
 }
 
 type product struct {
 	Id          string      `json:"id"`   // 出厂编号
-	Desc        string      `json:"Desc"` //描述信息
+	Desc        string      `json:"desc"` //描述信息
+	Milk        string      `json:"milk"` //奶粉id
 	Weight      int64       `json:"weight"`
 	Creator     string      `json:"creator"` //出厂厂家
 	Time        int64       `json:"time"`    //出厂时间
@@ -70,7 +74,7 @@ type product struct {
 type inspectInfo struct {
 	Inspection string `json:"inspection"` //检测机构
 	Time       int64  `json:"time"`       //检测时间
-	Desc       string `json:"Desc"`       //检测信息营养成分等
+	Desc       string `json:"desc"`       //检测信息营养成分等
 }
 
 //初始化方法
@@ -83,16 +87,10 @@ func (t *ImpChaincode) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 	function, args := stub.GetFunctionAndParameters()
 	if function == "initOrg" {
 		return t.initOrg(stub, args)
-	} else if function == "updateOrg" {
-		return t.updateOrg(stub, args)
-	} else if function == "queryOrg" {
-		return t.queryOrg(stub, args)
 	} else if function == "initMilkPowder" {
 		return t.initMilkPowder(stub, args)
 	} else if function == "transferMilkPowder" {
 		return t.transferMilkPowder(stub, args)
-	} else if function == "queryMilkPowder" {
-		return t.queryMilkPowder(stub, args)
 	} else if function == "queryMilkPowderAsset" {
 		return t.queryMilkPowderAsset(stub, args)
 	} else if function == "manufacture" {
@@ -105,8 +103,8 @@ func (t *ImpChaincode) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return t.getMyInspect(stub, args)
 	} else if function == "queryProductAsset" {
 		return t.queryProductAsset(stub, args)
-	} else if function == "queryProduct" {
-		return t.queryProduct(stub, args)
+	} else if function == "get" {
+		return t.get(stub, args)
 	}
 	return shim.Error("no this invoke function:" + function)
 }

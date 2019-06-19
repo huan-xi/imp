@@ -77,10 +77,10 @@ func (t *FundingChaincode) get(stub shim.ChaincodeStubInterface, args []string) 
 	key := args[0]
 	valAsbytes, err := stub.GetState(key) //get the milk from chaincode state
 	if err != nil {
-		jsonResp := "err"
+		jsonResp := "get statue error"
 		return shim.Error(jsonResp)
 	} else if valAsbytes == nil {
-		jsonResp := "err"
+		jsonResp := "not exist this id"
 		return shim.Error(jsonResp)
 	}
 	return shim.Success(valAsbytes)
@@ -103,10 +103,17 @@ func (t *FundingChaincode) update(stub shim.ChaincodeStubInterface, args []strin
 	if len(args) != 2 {
 		return shim.Error("Incorrect number of arguments. Expecting 2 key,value")
 	}
-
 	key := args[0]
 	value := args[1]
-	err := stub.PutState(key, []byte(value))
+	valAsbytes, err := stub.GetState(key) //get the milk from chaincode state
+	if err != nil {
+		jsonResp := "get statue error"
+		return shim.Error(jsonResp)
+	} else if valAsbytes == nil {
+		jsonResp := "not exist this id"
+		return shim.Error(jsonResp)
+	}
+	err = stub.PutState(key, []byte(value))
 	if err != nil {
 		return shim.Error("put state error")
 	}

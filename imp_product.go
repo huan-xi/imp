@@ -146,7 +146,6 @@ func (t *ImpChaincode) inspect(stub shim.ChaincodeStubInterface, args []string) 
 }
 
 //查询我的待检测
-//没有输入
 func (t *ImpChaincode) getMyInspect(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 	mspId, err := cid.GetMSPID(stub)
 	if err != nil {
